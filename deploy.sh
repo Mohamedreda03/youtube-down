@@ -39,11 +39,27 @@ fi
 echo "🏗️  Building Docker images..."
 docker compose -f docker-compose.prod.yml build
 
+# Copy cookies file into container if it exists
+if [ -f "cookies.txt" ]; then
+    echo "📝 Cookies file found - will be copied to container..."
+fi
+
 echo "🔄 Stopping old containers..."
 docker compose -f docker-compose.prod.yml down
 
 echo "▶️  Starting new containers..."
 docker compose -f docker-compose.prod.yml up -d
+
+# Copy cookies to running container if file exists
+if [ -f "cookies.txt" ]; then
+    echo "📋 Copying cookies to container..."
+    docker cp cookies.txt youtube-downloader:/app/cookies.txt
+    docker exec youtube-downloader chown nextjs:nodejs /app/cookies.txt
+    echo "✅ Cookies copied successfully!"
+else
+    echo "⚠️  No cookies.txt file found. YouTube may require authentication."
+    echo "   See COOKIES-SETUP.md for instructions."
+fi
 
 echo "⏳ Waiting for containers to be healthy..."
 sleep 10

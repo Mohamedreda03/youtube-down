@@ -15,8 +15,6 @@ services:
     volumes:
       # Optional: Persistent temp storage for large downloads
       - /tmp/youtube-downloads:/tmp/downloads
-      # Cookies file for YouTube authentication (create this file on the server)
-      - ./cookies.txt:/app/cookies.txt:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 30s

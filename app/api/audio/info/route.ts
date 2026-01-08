@@ -2,13 +2,12 @@
  * Audio Info API Route
  * POST /api/audio/info
  *
- * Fetches video metadata for audio extraction
- * Reuses the same yt-dlp command as video info
+ * Fetches video metadata for audio extraction using Cobalt API
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { isValidYouTubeUrl } from "@/lib/youtube";
-import { getVideoMetadata } from "@/lib/ytdlp";
+import { getVideoInfo } from "@/lib/cobalt";
 import { checkAllLimits } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -38,16 +37,14 @@ export async function POST(request: NextRequest) {
     // Sanitize URL to prevent command injection
     const sanitizedUrl = url.trim().replace(/[;&|`$(){}[\]<>]/g, "");
 
-    // Fetch metadata (same as video, we just use different fields)
-    const metadata = await getVideoMetadata(sanitizedUrl);
+    // Fetch metadata using Cobalt API
+    const metadata = await getVideoInfo(sanitizedUrl);
 
     // Return only audio-relevant data
     return NextResponse.json({
-      id: metadata.id,
       title: metadata.title,
       thumbnail: metadata.thumbnail,
       duration: metadata.duration,
-      durationFormatted: metadata.durationFormatted,
       channel: metadata.channel,
       audioFormats: metadata.audioFormats,
     });

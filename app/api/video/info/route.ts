@@ -2,15 +2,13 @@
  * Video Info API Route
  * POST /api/video/info
  *
- * Fetches video metadata using yt-dlp
- *
- * Example yt-dlp command:
- * yt-dlp -j --no-download "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+ * Fetches video metadata using Cobalt API
+ * Cobalt is a free service that supports YouTube, Instagram, TikTok, Twitter
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { isValidYouTubeUrl } from "@/lib/youtube";
-import { getVideoMetadata } from "@/lib/ytdlp";
+import { getVideoInfo } from "@/lib/cobalt";
 import { checkAllLimits } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -37,11 +35,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Sanitize URL to prevent command injection
-    const sanitizedUrl = url.trim().replace(/[;&|`$(){}[\]<>]/g, "");
-
-    // Fetch metadata
-    const metadata = await getVideoMetadata(sanitizedUrl);
+    // Fetch metadata using Cobalt API
+    const metadata = await getVideoInfo(url);
 
     return NextResponse.json(metadata);
   } catch (error) {

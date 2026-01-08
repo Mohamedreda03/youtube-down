@@ -112,7 +112,14 @@ interface RawMetadata {
  */
 function executeYtDlp(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    const process = spawn(YTDLP_PATH, args, {
+    // Add common options to bypass bot detection
+    const commonArgs = [
+      '--extractor-args', 'youtube:player_client=android',
+      '--user-agent', 'com.google.android.youtube/17.36.4 (Linux; U; Android 12; GB) gzip',
+      ...args
+    ];
+    
+    const process = spawn(YTDLP_PATH, commonArgs, {
       timeout: 60000, // 60 second timeout
     });
 

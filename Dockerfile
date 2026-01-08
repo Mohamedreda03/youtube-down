@@ -7,20 +7,8 @@ RUN apk add --no-cache \
     py3-pip \
     ffmpeg \
     curl \
-    git \
     && pip3 install --break-system-packages yt-dlp bgutil-ytdlp-pot-provider \
     && rm -rf /var/cache/apk/*
-
-# Setup POT provider server using npm instead of yarn
-RUN cd /tmp && \
-    git clone --single-branch --depth 1 https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git && \
-    cd bgutil-ytdlp-pot-provider/server && \
-    npm install && \
-    npx tsc && \
-    mkdir -p /opt/pot-provider && \
-    cp -r build /opt/pot-provider/ && \
-    cp -r node_modules /opt/pot-provider/ && \
-    cd / && rm -rf /tmp/bgutil-ytdlp-pot-provider
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -73,9 +61,6 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Copy POT provider from base
-COPY --from=base /opt/pot-provider /opt/pot-provider
-
 # yt-dlp and ffmpeg are already in PATH from the base image
-# Start POT provider server in background and then start the app
-CMD sh -c "node /opt/pot-provider/build/main.js &>/dev/null & sleep 2 && node server.js"
+# bgutil-ytdlp-pot-provider is installed via pip and works as yt-dlp plugin
+CMD ["node", "server.js"]

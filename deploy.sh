@@ -54,7 +54,8 @@ docker compose -f docker-compose.prod.yml up -d
 if [ -f "cookies.txt" ]; then
     echo "📋 Copying cookies to container..."
     docker cp cookies.txt youtube-downloader:/app/cookies.txt
-    docker exec youtube-downloader chown nextjs:nodejs /app/cookies.txt
+    docker exec --user root youtube-downloader chown nextjs:nodejs /app/cookies.txt
+    docker exec --user root youtube-downloader chmod 600 /app/cookies.txt
     echo "✅ Cookies copied successfully!"
 else
     echo "⚠️  No cookies.txt file found. YouTube may require authentication."

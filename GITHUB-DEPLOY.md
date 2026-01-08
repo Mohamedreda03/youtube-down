@@ -7,6 +7,7 @@
 ## 1️⃣ رفع الكود على GitHub
 
 ### الخطوة 1: إنشاء Repository على GitHub
+
 1. اذهب إلى https://github.com/new
 2. اسم الـ Repository: `youtube-downloader` (أو أي اسم تحبه)
 3. اختر **Private** (عشان الكود مايكونش عام)
@@ -39,6 +40,7 @@ git push -u origin main
 ```
 
 **ملاحظة:** لو طلب منك اسم مستخدم وكلمة مرور:
+
 - اسم المستخدم: اسم حسابك على GitHub
 - كلمة المرور: استخدم **Personal Access Token** بدل كلمة المرور العادية
   - اذهب إلى: https://github.com/settings/tokens
@@ -51,6 +53,7 @@ git push -u origin main
 ## 2️⃣ تنزيل الكود على EC2 Server
 
 ### SSH للسيرفر
+
 ```powershell
 ssh -i "C:\Users\Mohamed\Documents\youtube-down.pem" ubuntu@16.170.171.138
 ```
@@ -111,6 +114,7 @@ http://16.170.171.138.nip.io
 ## 🔄 للتحديثات المستقبلية (سهلة جداً!)
 
 ### على جهازك (بعد تعديل الكود):
+
 ```powershell
 cd E:\desktop\projects\in-progress\youtube-v2
 git add .
@@ -119,6 +123,7 @@ git push
 ```
 
 ### على السيرفر:
+
 ```bash
 ssh -i "C:\Users\Mohamed\Documents\youtube-down.pem" ubuntu@16.170.171.138
 cd youtube-v2
@@ -135,12 +140,14 @@ git pull
 إذا اخترت Private repository، السيرفر محتاج صلاحية للوصول:
 
 ### الطريقة 1: استخدام Personal Access Token
+
 ```bash
 # على السيرفر، بدل الأمر clone:
 git clone https://YOUR_TOKEN@github.com/YOUR_USERNAME/youtube-downloader.git youtube-v2
 ```
 
 ### الطريقة 2: استخدام SSH Key (أفضل)
+
 ```bash
 # على السيرفر:
 # 1. إنشاء SSH key

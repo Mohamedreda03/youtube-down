@@ -35,16 +35,18 @@ const COOKIES_FILE = process.env.YTDLP_COOKIES_FILE || "/app/cookies.txt";
  */
 function isValidCookiesFile(filePath: string): boolean {
   try {
-    const fs = require('fs');
+    const fs = require("fs");
     if (!fs.existsSync(filePath)) return false;
-    
-    const content = fs.readFileSync(filePath, 'utf8');
+
+    const content = fs.readFileSync(filePath, "utf8");
     // Check if file is not empty and looks like Netscape format
     // Netscape format starts with # or has tab-separated values
     if (content.trim().length < 50) return false;
-    if (content.includes('# Netscape HTTP Cookie File') || 
-        content.includes('# HTTP Cookie File') ||
-        content.includes('.youtube.com')) {
+    if (
+      content.includes("# Netscape HTTP Cookie File") ||
+      content.includes("# HTTP Cookie File") ||
+      content.includes(".youtube.com")
+    ) {
       return true;
     }
     return false;
@@ -138,20 +140,23 @@ function executeYtDlp(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
     // Add common options to bypass bot detection
     const commonArgs = [
-      '--extractor-args', 'youtube:player_client=web',
-      '--no-check-certificates',
+      "--extractor-args",
+      "youtube:player_client=web",
+      "--no-check-certificates",
     ];
-    
+
     // Add cookies only if file exists and is valid
     if (isValidCookiesFile(COOKIES_FILE)) {
-      commonArgs.push('--cookies', COOKIES_FILE);
-      console.log('[yt-dlp] Using cookies file for authentication');
+      commonArgs.push("--cookies", COOKIES_FILE);
+      console.log("[yt-dlp] Using cookies file for authentication");
     } else {
-      console.log('[yt-dlp] No valid cookies file found, trying without authentication');
+      console.log(
+        "[yt-dlp] No valid cookies file found, trying without authentication"
+      );
     }
-    
+
     commonArgs.push(...args);
-    
+
     const process = spawn(YTDLP_PATH, commonArgs, {
       timeout: 60000, // 60 second timeout
     });

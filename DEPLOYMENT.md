@@ -5,6 +5,7 @@
 ## متطلبات السيرفر المقترحة
 
 ### الحد الأدنى (للاختبار):
+
 - **Instance Type:** t3.medium
 - **CPU:** 2 vCPU
 - **RAM:** 4 GB
@@ -12,6 +13,7 @@
 - **⚠️ تحذير:** مناسب فقط للاختبار أو الاستخدام الخفيف
 
 ### المقترح للإنتاج:
+
 - **Instance Type:** t3.large أو c6i.xlarge
 - **CPU:** 4 vCPU
 - **RAM:** 8-16 GB
@@ -24,6 +26,7 @@
 ## الخطوة 1: إعداد EC2 Instance
 
 ### 1.1 إنشاء Instance جديدة
+
 ```bash
 # من لوحة تحكم AWS EC2:
 1. اضغط "Launch Instance"
@@ -39,6 +42,7 @@
 ```
 
 ### 1.2 الاتصال بالسيرفر
+
 ```bash
 # من جهازك المحلي (PowerShell أو Terminal)
 ssh -i "your-key.pem" ubuntu@your-ec2-public-ip
@@ -49,11 +53,13 @@ ssh -i "your-key.pem" ubuntu@your-ec2-public-ip
 ## الخطوة 2: تثبيت المتطلبات على السيرفر
 
 ### 2.1 تحديث النظام
+
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
 ### 2.2 تثبيت Docker
+
 ```bash
 # تثبيت Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -73,6 +79,7 @@ ssh -i "your-key.pem" ubuntu@your-ec2-public-ip
 ```
 
 ### 2.3 تثبيت Docker Compose
+
 ```bash
 # تثبيت أحدث إصدار
 sudo apt install docker-compose-plugin -y
@@ -82,6 +89,7 @@ docker compose version
 ```
 
 ### 2.4 تثبيت Git
+
 ```bash
 sudo apt install git -y
 ```
@@ -91,6 +99,7 @@ sudo apt install git -y
 ## الخطوة 3: رفع الكود إلى السيرفر
 
 ### ⚡ الطريقة الأسهل: استخدام PowerShell Script (موصى بها)
+
 ```powershell
 # من مجلد المشروع على جهازك (PowerShell)
 cd E:\desktop\projects\in-progress\youtube-v2
@@ -100,6 +109,7 @@ cd E:\desktop\projects\in-progress\youtube-v2
 ```
 
 ### الطريقة 2: استخدام Git (للتحديثات المستمرة)
+
 ```bash
 # على جهازك: ارفع الكود على GitHub أولاً
 cd E:\desktop\projects\in-progress\youtube-v2
@@ -117,6 +127,7 @@ cd youtube-v2
 ```
 
 ### الطريقة 3: رفع الملفات يدوياً عبر SCP
+
 ```powershell
 # من جهازك المحلي (PowerShell)
 cd E:\desktop\projects\in-progress\youtube-v2
@@ -132,6 +143,7 @@ scp -i "your-key.pem" -r . ubuntu@YOUR-EC2-IP:~/youtube-v2/
 ## الخطوة 4: بناء وتشغيل التطبيق
 
 ### 4.1 إنشاء ملف البيئة
+
 ```bash
 # إنشاء ملف .env من المثال
 cp .env.example .env
@@ -141,6 +153,7 @@ nano .env
 ```
 
 ### 4.2 بناء الـ Docker Image
+
 ```bash
 # بناء الـ Image (قد يستغرق 5-10 دقائق)
 docker compose -f docker-compose.prod.yml build
@@ -150,6 +163,7 @@ docker compose build
 ```
 
 ### 4.3 تشغيل التطبيق
+
 ```bash
 # تشغيل مع nginx (إنتاج)
 docker compose -f docker-compose.prod.yml up -d
@@ -159,6 +173,7 @@ docker compose up -d
 ```
 
 ### 4.4 التحقق من التشغيل
+
 ```bash
 # عرض الـ containers الشغالة
 docker ps
@@ -178,6 +193,7 @@ http://YOUR_EC2_PUBLIC_IP
 ## الخطوة 5: إعداد Domain Name و SSL (اختياري)
 
 ### 5.1 استخدام nip.io (مجاني وفوري - موصى به للبداية)
+
 ```bash
 # nip.io يحول IP تلقائياً إلى domain
 # مثال: إذا IP السيرفر 54.123.45.67
@@ -191,6 +207,7 @@ http://YOUR-EC2-IP.nip.io
 **✅ لا تحتاج أي إعداد إضافي! nginx.conf جاهز للعمل مع nip.io**
 
 ### 5.2 ربط Domain خاص (اختياري)
+
 ```bash
 # إذا كان عندك domain خاص (مثل yourdomain.com)
 # من DNS Provider (Cloudflare, Namecheap, إلخ):
@@ -200,6 +217,7 @@ http://YOUR-EC2-IP.nip.io
 ```
 
 ### 5.2 تثبيت SSL مجاني باستخدام Certbot
+
 ```bash
 # تثبيت Certbot
 sudo a4t install certbot python3-certbot-nginx -y
@@ -218,6 +236,7 @@ docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### 5.3 تحديث nginx.conf للـ SSL
+
 ```nginx
 # أضف هذا في nginx.conf
 server {
@@ -226,7 +245,7 @@ server {
 
     ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
-    
+
     # باقي الإعدادات...
 }
 
@@ -242,6 +261,7 @@ server {
 ## الخطوة 6: الصيانة والمراقبة
 
 ### 6.1 أوامر مفيدة
+
 ```bash
 # عرض حالة الـ containers
 docker compose -f docker-compose.prod.yml ps
@@ -262,6 +282,7 @@ docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### 6.2 مراقبة الموارد
+
 ```bash
 # عرض استخدام CPU/RAM
 docker stats
@@ -274,6 +295,7 @@ sudo journalctl -u docker -f
 ```
 
 ### 6.3 النسخ الاحتياطي
+
 ```bash
 # عمل backup للـ volumes (إذا كنت تخزن بيانات)
 docker run --rm -v youtube-v2_downloads:/data -v $(pwd):/backup \
@@ -287,6 +309,7 @@ docker run --rm -v youtube-v2_downloads:/data -v $(pwd):/backup \
 ## الخطوة 7: التحسينات والأمان
 
 ### 7.1 إعداد Firewall
+
 ```bash
 # تفعيل UFW
 sudo ufw allow 22/tcp
@@ -297,12 +320,14 @@ sudo ufw status
 ```
 
 ### 7.2 Auto-renewal لشهادة SSL
+
 ```bash
 # Certbot يضيف cron job تلقائياً، للتحقق:
 sudo certbot renew --dry-run
 ```
 
 ### 7.3 تحديد حدود الموارد
+
 ```bash
 # عدّل docker-compose.prod.yml:
 # - للـ instance 4GB RAM: limits memory: 3G
@@ -310,6 +335,7 @@ sudo certbot renew --dry-run
 ```
 
 ### 7.4 مراقبة تلقائية (اختياري)
+
 ```bash
 # تثبيت monitoring tools
 # - Prometheus + Grafana
@@ -323,6 +349,7 @@ curl -Ss 'https://my-netdata.io/kickstart.sh' | bash
 ## استكشاف المشاكل الشائعة
 
 ### المشكلة 1: التطبيق لا يعمل
+
 ```bash
 # تحقق من الـ logs
 docker compose -f docker-compose.prod.yml logs
@@ -338,6 +365,7 @@ docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### المشكلة 2: نفاد الذاكرة
+
 ```bash
 # تقليل عدد العمليات المتزامنة
 # قلّل limits في docker-compose.prod.yml
@@ -346,6 +374,7 @@ docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### المشكلة 3: التحميل بطيء
+
 ```bash
 # تحقق من سرعة الشبكة
 sudo apt install speedtest-cli -y
@@ -362,6 +391,7 @@ htop
 ## الخلاصة
 
 ✅ **للبدء السريع:**
+
 ```bash
 # على السيرفر
 cd ~/apps/youtube-v2
@@ -369,12 +399,14 @@ docker compose -f docker-compose.prod.yml up -d
 ```
 
 ✅ **للتحديث:**
+
 ```bash
 git pull
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 ✅ **للمراقبة:**
+
 ```bash
 docker compose -f docker-compose.prod.yml logs -f
 docker stats
@@ -385,6 +417,7 @@ docker stats
 ## الدعم والمساعدة
 
 إذا واجهت أي مشكلة:
+
 1. تحقق من الـ logs أولاً
 2. تأكد من فتح الـ ports في Security Group
 3. تأكد من كفاية موارد السيرفر

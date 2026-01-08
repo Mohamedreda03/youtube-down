@@ -5,8 +5,9 @@ YouTube بيكتشف yt-dlp كـ bot ويطلب تسجيل دخول. الحل:
 ## ✅ التحديث اللي عملته:
 
 أضفت cookies extraction من Chrome تلقائياً:
+
 ```typescript
-'--cookies-from-browser', 'chrome'
+"--cookies-from-browser", "chrome";
 ```
 
 ---

@@ -3,6 +3,7 @@
 ## رفع الموقع على EC2 في 3 خطوات فقط!
 
 ### 1️⃣ رفع الكود للسيرفر
+
 ```powershell
 # من PowerShell على جهازك
 cd E:\desktop\projects\in-progress\youtube-v2
@@ -10,6 +11,7 @@ cd E:\desktop\projects\in-progress\youtube-v2
 ```
 
 ### 2️⃣ تسجيل الدخول ونشر التطبيق
+
 ```bash
 # SSH للسيرفر
 ssh -i "your-key.pem" ubuntu@YOUR-IP
@@ -29,6 +31,7 @@ cd ~/youtube-v2
 ```
 
 ### 3️⃣ افتح الموقع!
+
 ```
 http://YOUR-EC2-IP.nip.io
 ```
@@ -67,13 +70,16 @@ git pull
 ## 🆘 مشاكل شائعة
 
 **لا يمكن الاتصال بالسيرفر؟**
+
 - تأكد من فتح Ports 22, 80, 443 في Security Group
 
 **الموقع لا يفتح؟**
+
 - تحقق من أن الـ containers شغالة: `docker ps`
 - شاهد الـ logs: `docker logs youtube-downloader`
 
 **نسيت IP السيرفر؟**
+
 ```bash
 # على السيرفر
 curl ifconfig.me

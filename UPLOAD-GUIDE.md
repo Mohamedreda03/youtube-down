@@ -7,6 +7,7 @@
 ## 🎯 الطريقة الأسهل: استخدام PowerShell Script (موصى بها)
 
 ### الخطوة 1: تجهيز المتطلبات
+
 ```powershell
 # تأكد أن عندك:
 # 1. ملف المفتاح .pem (من AWS)
@@ -15,6 +16,7 @@
 ```
 
 ### الخطوة 2: تشغيل السكريبت
+
 ```powershell
 # من مجلد المشروع
 cd E:\desktop\projects\in-progress\youtube-v2
@@ -24,6 +26,7 @@ cd E:\desktop\projects\in-progress\youtube-v2
 ```
 
 ### الخطوة 3: الاتصال بالسيرفر والنشر
+
 ```bash
 # سيظهر لك الأوامر، انسخها وشغّلها:
 ssh -i "your-key.pem" ubuntu@54.123.45.67
@@ -40,6 +43,7 @@ cd ~/youtube-v2
 ```
 
 **✅ خلاص! الموقع شغال على:**
+
 ```
 http://YOUR-IP.nip.io
 ```
@@ -51,12 +55,14 @@ http://YOUR-IP.nip.io
 ### 1. إنشاء Repository على GitHub
 
 #### من موقع GitHub:
+
 1. اذهب إلى https://github.com/new
 2. اسم الـ repo: `youtube-downloader` (أو أي اسم)
 3. اجعله Private (أو Public حسب رغبتك)
 4. اضغط "Create repository"
 
 #### رفع الكود من جهازك:
+
 ```powershell
 # في مجلد المشروع (PowerShell)
 cd E:\desktop\projects\in-progress\youtube-v2
@@ -126,6 +132,7 @@ git pull
 ## 💾 الطريقة الثالثة: SCP (رفع يدوي مباشر)
 
 ### باستخدام PowerShell:
+
 ```powershell
 # رفع كل المشروع
 scp -i "C:\path\to\your-key.pem" -r E:\desktop\projects\in-progress\youtube-v2 ubuntu@YOUR-EC2-IP:~/
@@ -135,6 +142,7 @@ scp -i "C:\path\to\your-key.pem" E:\desktop\projects\in-progress\youtube-v2\pack
 ```
 
 ### باستخدام WinSCP (برنامج بواجهة رسومية):
+
 1. حمّل WinSCP من: https://winscp.net/
 2. افتح البرنامج
 3. إعدادات الاتصال:
@@ -150,6 +158,7 @@ scp -i "C:\path\to\your-key.pem" E:\desktop\projects\in-progress\youtube-v2\pack
 ## 🔄 الطريقة الرابعة: rsync (الأسرع للتحديثات)
 
 ### تثبيت rsync على Windows:
+
 ```powershell
 # عبر WSL (Windows Subsystem for Linux)
 wsl --install
@@ -159,6 +168,7 @@ sudo apt update && sudo apt install rsync -y
 ```
 
 ### استخدام rsync:
+
 ```bash
 # من WSL أو PowerShell (مع rsync مثبت):
 rsync -avz -e "ssh -i /path/to/key.pem" \
@@ -176,6 +186,7 @@ rsync -avz -e "ssh -i /path/to/key.pem" \
 nip.io خدمة مجانية تحول IP الخاص بك إلى domain تلقائياً!
 
 ### كيف يعمل:
+
 ```
 إذا IP السيرفر: 54.123.45.67
 الـ Domain يكون: 54.123.45.67.nip.io
@@ -192,6 +203,7 @@ http://YOUR-EC2-IP.nip.io
 ```
 
 ### مثال عملي:
+
 ```bash
 # لو IP السيرفر: 3.80.45.123
 # افتح: http://3.80.45.123.nip.io
@@ -204,6 +216,7 @@ http://YOUR-EC2-IP.nip.io
 ## 🔍 التحقق من نجاح الرفع
 
 ### 1. تحقق من الملفات على السيرفر:
+
 ```bash
 ssh -i "your-key.pem" ubuntu@YOUR-EC2-IP
 cd ~/youtube-v2
@@ -219,12 +232,14 @@ ls -la
 ```
 
 ### 2. تحقق من حجم الملفات:
+
 ```bash
 du -sh ~/youtube-v2
 # يجب أن يكون حوالي 1-5 MB (بدون node_modules)
 ```
 
 ### 3. اختبر الاتصال:
+
 ```bash
 # من السيرفر
 curl http://localhost:3000
@@ -238,6 +253,7 @@ curl http://YOUR-EC2-IP.nip.io
 ## ❓ حل المشاكل الشائعة
 
 ### المشكلة 1: Permission denied (publickey)
+
 ```bash
 # تأكد من صلاحيات المفتاح
 # على Windows (PowerShell):
@@ -250,6 +266,7 @@ ssh -i "key.pem" -v ubuntu@YOUR-IP
 ```
 
 ### المشكلة 2: Connection timeout
+
 ```bash
 # تحقق من Security Group في AWS:
 # 1. افتح EC2 Console
@@ -260,6 +277,7 @@ ssh -i "key.pem" -v ubuntu@YOUR-IP
 ```
 
 ### المشكلة 3: Host key verification failed
+
 ```powershell
 # احذف المفتاح القديم
 ssh-keygen -R YOUR-EC2-IP
@@ -269,6 +287,7 @@ ssh -o "StrictHostKeyChecking=no" -i "key.pem" ubuntu@YOUR-IP
 ```
 
 ### المشكلة 4: الملفات لم تُرفع كاملة
+
 ```bash
 # تحقق من حجم الملفات
 # على جهازك:
@@ -286,12 +305,14 @@ scp -v -i "key.pem" -r . ubuntu@YOUR-IP:~/youtube-v2/
 ## 📋 Checklist سريع
 
 قبل الرفع:
+
 - [ ] عندك ملف .pem من AWS
 - [ ] تعرف IP الـ EC2
 - [ ] Security Group فاتح Port 22, 80, 443
 - [ ] جربت الاتصال بـ SSH
 
 بعد الرفع:
+
 - [ ] الملفات موجودة في `~/youtube-v2`
 - [ ] شغّلت `setup-ec2.sh` (أول مرة)
 - [ ] شغّلت `deploy.sh`
@@ -303,6 +324,7 @@ scp -v -i "key.pem" -r . ubuntu@YOUR-IP:~/youtube-v2/
 ## 🚀 الخلاصة السريعة
 
 **أسهل طريقة:**
+
 ```powershell
 # 1. من جهازك (PowerShell)
 .\upload-to-ec2.ps1 -KeyPath "key.pem" -EC2_IP "YOUR-IP"

@@ -1,5 +1,7 @@
 # ============================================
+
 # حل مشكلة YouTube Bot Detection - الدليل الكامل
+
 # ============================================
 
 ## ❓ السبب الأساسي للمشكلة:
@@ -30,10 +32,12 @@ yt-dlp --cookies-from-browser chrome --cookies cookies.txt -F "https://www.youtu
 #### الطريقة B: استخدام Extension (بديل)
 
 1. **نزّل Extension في Chrome:**
+
    - الاسم: **"Get cookies.txt LOCALLY"**
    - الرابط: https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 
 2. **سجل دخول YouTube:**
+
    - افتح https://youtube.com
    - تأكد إنك مسجل دخول
 
@@ -113,6 +117,7 @@ http://16.170.171.138.nip.io
 **السبب:** الملف فارغ أو بـ format خاطئ
 
 **الحل:**
+
 ```powershell
 # على جهازك - استخدم yt-dlp لتصدير cookies
 yt-dlp --cookies-from-browser chrome --cookies cookies.txt -F "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -127,6 +132,7 @@ notepad cookies.txt
 **السبب:** Cookies غير صالحة أو منتهية
 
 **الحل:**
+
 1. سجل دخول YouTube في Chrome من جديد
 2. صدّر cookies جديدة
 3. ارفعها للسيرفر
@@ -134,6 +140,7 @@ notepad cookies.txt
 ### المشكلة: لا يوجد yt-dlp على جهازي
 
 **الحل:**
+
 ```powershell
 # تثبيت yt-dlp على Windows
 winget install yt-dlp

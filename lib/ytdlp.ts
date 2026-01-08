@@ -138,27 +138,25 @@ interface RawMetadata {
  */
 function executeYtDlp(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    // Add common options to bypass bot detection
+    // Use POT provider to bypass YouTube bot detection
+    // bgutil-ytdlp-pot-provider generates Proof of Origin Tokens
     const commonArgs = [
       "--extractor-args",
       "youtube:player_client=web",
       "--no-check-certificates",
+      "--no-warnings",
     ];
 
-    // Add cookies only if file exists and is valid
+    // Add cookies only if file exists and is valid (as fallback)
     if (isValidCookiesFile(COOKIES_FILE)) {
       commonArgs.push("--cookies", COOKIES_FILE);
       console.log("[yt-dlp] Using cookies file for authentication");
-    } else {
-      console.log(
-        "[yt-dlp] No valid cookies file found, trying without authentication"
-      );
     }
 
     commonArgs.push(...args);
 
     const process = spawn(YTDLP_PATH, commonArgs, {
-      timeout: 60000, // 60 second timeout
+      timeout: 120000, // 120 second timeout (POT generation takes time)
     });
 
     let stdout = "";

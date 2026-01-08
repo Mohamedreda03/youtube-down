@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const url = searchParams.get("url");
-  const quality = searchParams.get("quality") || "1080";
+  const formatId = searchParams.get("formatId") || "1080";
 
   // Rate limiting
   const rateLimit = checkAllLimits(request);
@@ -37,7 +37,8 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get download URL from Cobalt API
-    const downloadUrl = await downloadVideo(url, quality);
+    // formatId is like "1080", "720", etc.
+    const downloadUrl = await downloadVideo(url, formatId);
 
     // Redirect to the download URL
     return NextResponse.redirect(downloadUrl, 302);

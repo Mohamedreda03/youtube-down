@@ -4,6 +4,11 @@
  * Docs: https://github.com/imputnet/cobalt
  */
 
+// Import from youtube.ts to match existing interfaces
+import type { VideoFormat, AudioFormat, VideoMetadata } from "./youtube";
+import { getYouTubeVideoInfo } from "./youtube-api";
+import { extractVideoId } from "./youtube";
+
 const COBALT_API_URL = "https://api.cobalt.tools/api/json";
 
 export interface CobaltVideoInfo {
@@ -19,127 +24,20 @@ export interface CobaltVideoInfo {
   text?: string;
 }
 
-// Import from youtube.ts to match existing interfaces
-import type { VideoFormat, AudioFormat, VideoMetadata } from "./youtube";
-
 /**
  * Get video information from URL
+ * Uses YouTube Innertube API for detailed info with real file sizes and available qualities
  */
 export async function getVideoInfo(url: string): Promise<VideoMetadata> {
   try {
-    // For YouTube, we can get basic info from the URL
-    const videoId = extractYouTubeId(url);
+    // Extract video ID
+    const videoId = extractVideoId(url);
     if (!videoId) {
       throw new Error("Invalid YouTube URL");
     }
 
-    // Use YouTube oEmbed API for basic info (no bot detection)
-    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
-    const response = await fetch(oembedUrl);
-    
-    if (!response.ok) {
-      throw new Error("Failed to fetch video info");
-    }
-
-    const data = await response.json();
-
-    // Standard qualities available through Cobalt
-    const videoFormats: VideoFormat[] = [
-      {
-        formatId: "2160",
-        ext: "mp4",
-        resolution: "2160p",
-        quality: "2160p",
-        hasAudio: true,
-        hasVideo: true,
-        vcodec: "h264",
-        acodec: "aac",
-      },
-      {
-        formatId: "1440",
-        ext: "mp4",
-        resolution: "1440p",
-        quality: "1440p",
-        hasAudio: true,
-        hasVideo: true,
-        vcodec: "h264",
-        acodec: "aac",
-      },
-      {
-        formatId: "1080",
-        ext: "mp4",
-        resolution: "1080p",
-        quality: "1080p",
-        hasAudio: true,
-        hasVideo: true,
-        vcodec: "h264",
-        acodec: "aac",
-      },
-      {
-        formatId: "720",
-        ext: "mp4",
-        resolution: "720p",
-        quality: "720p",
-        hasAudio: true,
-        hasVideo: true,
-        vcodec: "h264",
-        acodec: "aac",
-      },
-      {
-        formatId: "480",
-        ext: "mp4",
-        resolution: "480p",
-        quality: "480p",
-        hasAudio: true,
-        hasVideo: true,
-        vcodec: "h264",
-        acodec: "aac",
-      },
-      {
-        formatId: "360",
-        ext: "mp4",
-        resolution: "360p",
-        quality: "360p",
-        hasAudio: true,
-        hasVideo: true,
-        vcodec: "h264",
-        acodec: "aac",
-      },
-    ];
-
-    const audioFormats: AudioFormat[] = [
-      {
-        formatId: "mp3-best",
-        ext: "mp3",
-        quality: "best",
-        acodec: "mp3",
-        abr: 320,
-      },
-      {
-        formatId: "ogg-best",
-        ext: "ogg",
-        quality: "best",
-        acodec: "opus",
-      },
-      {
-        formatId: "wav-best",
-        ext: "wav",
-        quality: "best",
-        acodec: "pcm",
-      },
-    ];
-
-    return {
-      id: videoId,
-      title: data.title || "Unknown Title",
-      thumbnail: data.thumbnail_url || `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-      duration: 0, // oEmbed doesn't provide duration
-      durationFormatted: "N/A",
-      channel: data.author_name || "Unknown Channel",
-      channelUrl: data.author_url,
-      formats: videoFormats,
-      audioFormats: audioFormats,
-    };
+    // Use YouTube Innertube API for detailed info
+    return await getYouTubeVideoInfo(videoId);
   } catch (error) {
     console.error("[Cobalt] Error fetching video info:", error);
     throw error;
@@ -148,12 +46,32 @@ export async function getVideoInfo(url: string): Promise<VideoMetadata> {
 
 /**
  * Download video using Cobalt API
+ * formatId from YouTube API (itag) needs to be converted to quality for Cobalt
  */
 export async function downloadVideo(
   url: string,
-  quality: string = "1080"
+  formatId: string = "1080"
 ): Promise<string> {
   try {
+    // Convert formatId to quality string for Cobalt
+    // Common itags: 22=720p, 18=360p, 137=1080p, etc.
+    // For simplicity, use formatId as quality if it's already a number like "1080", "720"
+    let quality = formatId;
+    
+    // If formatId is an itag (3-digit number), map to quality
+    const itagToQuality: Record<string, string> = {
+      "22": "720",
+      "18": "360",
+      "137": "1080",
+      "136": "720",
+      "298": "720",
+      "299": "1080",
+    };
+    
+    if (itagToQuality[formatId]) {
+      quality = itagToQuality[formatId];
+    }
+
     const response = await fetch(COBALT_API_URL, {
       method: "POST",
       headers: {
@@ -172,6 +90,8 @@ export async function downloadVideo(
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[Cobalt] API Error:", errorText);
       throw new Error(`Cobalt API error: ${response.statusText}`);
     }
 
@@ -252,23 +172,4 @@ export async function downloadAudio(
     console.error("[Cobalt] Audio download error:", error);
     throw error;
   }
-}
-
-/**
- * Extract YouTube video ID from URL
- */
-function extractYouTubeId(url: string): string | null {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-    /^([a-zA-Z0-9_-]{11})$/,
-  ];
-
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) {
-      return match[1];
-    }
-  }
-
-  return null;
 }

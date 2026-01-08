@@ -54,9 +54,6 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Create empty cookies file (will be populated from host if needed)
-RUN touch /app/cookies.txt && chown nextjs:nodejs /app/cookies.txt
-
 USER nextjs
 
 EXPOSE 3000

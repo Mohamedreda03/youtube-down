@@ -2,24 +2,20 @@
  * Audio Download API Route
  * GET /api/audio/download
  *
- * Downloads audio using Cobalt API and redirects to download URL
+ * Downloads audio using direct YouTube URLs from Innertube API
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { isValidYouTubeUrl } from "@/lib/youtube";
-import { downloadAudio } from "@/lib/cobalt";
+import { isValidYouTubeUrl, extractVideoId } from "@/lib/youtube";
+import { getFormatDownloadUrl } from "@/lib/youtube-api";
 import { checkAllLimits } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
-// Allowed formats
-const ALLOWED_FORMATS = ["mp3", "ogg", "wav"] as const;
-type AudioFormat = (typeof ALLOWED_FORMATS)[number];
-
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const url = searchParams.get("url");
-  const format = searchParams.get("format") as AudioFormat | null;
+  const formatId = searchParams.get("formatId");
 
   // Rate limiting
   const rateLimit = checkAllLimits(request);
@@ -28,21 +24,30 @@ export async function GET(request: NextRequest) {
   }
 
   // Validate inputs
-  if (!url) {
-    return NextResponse.json({ error: "URL is required" }, { status: 400 });
+  if (!url || !formatId) {
+    return NextResponse.json(
+      { error: "URL and formatId are required" },
+      { status: 400 }
+    );
   }
 
   if (!isValidYouTubeUrl(url)) {
     return NextResponse.json({ error: "Invalid YouTube URL" }, { status: 400 });
   }
 
-  // Validate format
-  const audioFormat: AudioFormat =
-    format && ALLOWED_FORMATS.includes(format) ? format : "mp3";
-
   try {
-    // Get download URL from Cobalt API
-    const downloadUrl = await downloadAudio(url, audioFormat);
+    // Extract video ID
+    const videoId = extractVideoId(url);
+    if (!videoId) {
+      throw new Error("Invalid YouTube URL");
+    }
+
+    // Get download URL from cached format URLs
+    const downloadUrl = getFormatDownloadUrl(videoId, formatId);
+    
+    if (!downloadUrl) {
+      throw new Error("Download URL not found. Please fetch audio info first.");
+    }
 
     // Redirect to the download URL
     return NextResponse.redirect(downloadUrl, 302);

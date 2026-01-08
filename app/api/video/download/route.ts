@@ -2,12 +2,12 @@
  * Video Download API Route
  * GET /api/video/download
  *
- * Downloads video using Cobalt API and redirects to download URL
+ * Downloads video using direct YouTube URLs from Innertube API
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { isValidYouTubeUrl } from "@/lib/youtube";
-import { downloadVideo } from "@/lib/cobalt";
+import { isValidYouTubeUrl, extractVideoId } from "@/lib/youtube";
+import { getFormatDownloadUrl } from "@/lib/youtube-api";
 import { checkAllLimits } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const url = searchParams.get("url");
-  const formatId = searchParams.get("formatId") || "1080";
+  const formatId = searchParams.get("formatId");
 
   // Rate limiting
   const rateLimit = checkAllLimits(request);
@@ -24,9 +24,9 @@ export async function GET(request: NextRequest) {
   }
 
   // Validate inputs
-  if (!url) {
+  if (!url || !formatId) {
     return NextResponse.json(
-      { error: "URL is required" },
+      { error: "URL and formatId are required" },
       { status: 400 }
     );
   }
@@ -36,9 +36,18 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Get download URL from Cobalt API
-    // formatId is like "1080", "720", etc.
-    const downloadUrl = await downloadVideo(url, formatId);
+    // Extract video ID
+    const videoId = extractVideoId(url);
+    if (!videoId) {
+      throw new Error("Invalid YouTube URL");
+    }
+
+    // Get download URL from cached format URLs
+    const downloadUrl = getFormatDownloadUrl(videoId, formatId);
+    
+    if (!downloadUrl) {
+      throw new Error("Download URL not found. Please fetch video info first.");
+    }
 
     // Redirect to the download URL
     return NextResponse.redirect(downloadUrl, 302);

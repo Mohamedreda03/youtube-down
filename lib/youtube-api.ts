@@ -43,6 +43,20 @@ interface InnertubeResponse {
   };
 }
 
+// Store format URLs for direct download
+const formatUrls = new Map<string, string>();
+
+/**
+ * Get download URL for a specific format
+ */
+export function getFormatDownloadUrl(
+  videoId: string,
+  formatId: string
+): string | null {
+  const key = `${videoId}-${formatId}`;
+  return formatUrls.get(key) || null;
+}
+
 /**
  * Get video information using YouTube Innertube API
  */
@@ -93,9 +107,13 @@ export async function getYouTubeVideoInfo(
       .map((f) => {
         const resolution = f.qualityLabel || `${f.height}p`;
         const hasAudio = f.mimeType?.includes("audio") || false;
+        const formatId = f.itag.toString();
+        
+        // Store the download URL
+        formatUrls.set(`${videoId}-${formatId}`, f.url);
         
         return {
-          formatId: f.itag.toString(),
+          formatId: formatId,
           ext: "mp4",
           resolution: resolution,
           quality: resolution,
@@ -122,14 +140,21 @@ export async function getYouTubeVideoInfo(
     const audioFormats: AudioFormat[] = allFormats
       .filter((f) => f.mimeType?.includes("audio"))
       .slice(0, 3) // Take top 3 audio formats
-      .map((f, index) => ({
-        formatId: f.itag.toString(),
-        ext: f.mimeType?.includes("mp4") ? "m4a" : "webm",
-        quality: f.audioQuality || "medium",
-        acodec: f.mimeType?.includes("opus") ? "opus" : "aac",
-        filesize: f.contentLength ? parseInt(f.contentLength) : undefined,
-        abr: f.bitrate ? Math.round(f.bitrate / 1000) : undefined,
-      }));
+      .map((f) => {
+        const formatId = f.itag.toString();
+        
+        // Store the download URL
+        formatUrls.set(`${videoId}-${formatId}`, f.url);
+        
+        return {
+          formatId: formatId,
+          ext: f.mimeType?.includes("mp4") ? "m4a" : "webm",
+          quality: f.audioQuality || "medium",
+          acodec: f.mimeType?.includes("opus") ? "opus" : "aac",
+          filesize: f.contentLength ? parseInt(f.contentLength) : undefined,
+          abr: f.bitrate ? Math.round(f.bitrate / 1000) : undefined,
+        };
+      });
 
     const thumbnail =
       data.videoDetails.thumbnail.thumbnails.slice(-1)[0]?.url ||

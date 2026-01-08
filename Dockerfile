@@ -8,15 +8,14 @@ RUN apk add --no-cache \
     ffmpeg \
     curl \
     git \
-    yarn \
     && pip3 install --break-system-packages yt-dlp bgutil-ytdlp-pot-provider \
     && rm -rf /var/cache/apk/*
 
-# Setup POT provider server
+# Setup POT provider server using npm instead of yarn
 RUN cd /tmp && \
     git clone --single-branch --depth 1 https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git && \
     cd bgutil-ytdlp-pot-provider/server && \
-    yarn install --frozen-lockfile && \
+    npm install && \
     npx tsc && \
     mkdir -p /opt/pot-provider && \
     cp -r build /opt/pot-provider/ && \

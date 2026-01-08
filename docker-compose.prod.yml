@@ -12,6 +12,10 @@ services:
       - NEXT_TELEMETRY_DISABLED=1
       - PORT=3000
       - HOSTNAME=0.0.0.0
+      # Optional: Add proxy to bypass datacenter IP blocking
+      # Uncomment and set your proxy URL if needed
+      # - HTTP_PROXY=http://username:password@proxy-host:port
+      # - HTTPS_PROXY=http://username:password@proxy-host:port
     volumes:
       # Optional: Persistent temp storage for large downloads
       - /tmp/youtube-downloads:/tmp/downloads

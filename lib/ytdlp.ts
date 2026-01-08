@@ -148,6 +148,13 @@ function executeYtDlp(args: string[]): Promise<string> {
       "--geo-bypass",
     ];
 
+    // Add proxy if environment variable is set (to bypass datacenter IP blocking)
+    const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
+    if (proxyUrl) {
+      commonArgs.push("--proxy", proxyUrl);
+      console.log("[yt-dlp] Using proxy:", proxyUrl.replace(/:[^:]*@/, ':***@')); // Hide password
+    }
+
     // Add cookies only if file exists and is valid (as fallback)
     if (isValidCookiesFile(COOKIES_FILE)) {
       commonArgs.push("--cookies", COOKIES_FILE);

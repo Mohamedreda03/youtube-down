@@ -138,13 +138,14 @@ interface RawMetadata {
  */
 function executeYtDlp(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    // Use POT provider to bypass YouTube bot detection
-    // bgutil-ytdlp-pot-provider generates Proof of Origin Tokens
+    // Try multiple player clients to bypass bot detection
+    // tv_embedded and mweb often have less strict checks
     const commonArgs = [
       "--extractor-args",
-      "youtube:player_client=web",
+      "youtube:player_client=tv_embedded,mweb",
       "--no-check-certificates",
       "--no-warnings",
+      "--geo-bypass",
     ];
 
     // Add cookies only if file exists and is valid (as fallback)
@@ -156,7 +157,7 @@ function executeYtDlp(args: string[]): Promise<string> {
     commonArgs.push(...args);
 
     const process = spawn(YTDLP_PATH, commonArgs, {
-      timeout: 120000, // 120 second timeout (POT generation takes time)
+      timeout: 120000, // 120 second timeout
     });
 
     let stdout = "";

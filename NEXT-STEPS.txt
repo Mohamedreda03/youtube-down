@@ -1,0 +1,40 @@
+# ========================================
+# خطوات النشر السريع
+# ========================================
+
+# 1️⃣ اتصل بالسيرفر
+ssh -i "C:\Users\Mohamed\Documents\youtube-down.pem" ubuntu@16.170.171.138
+
+# 2️⃣ بعد الدخول للسيرفر، شغّل الأوامر دي:
+cd ~/youtube-v2
+chmod +x setup-ec2.sh deploy.sh
+./setup-ec2.sh
+
+# 3️⃣ سيطلب منك تسجيل خروج - اعمل:
+exit
+
+# 4️⃣ سجل دخول مرة أخرى:
+ssh -i "C:\Users\Mohamed\Documents\youtube-down.pem" ubuntu@16.170.171.138
+
+# 5️⃣ نشر التطبيق:
+cd ~/youtube-v2
+./deploy.sh
+
+# 6️⃣ افتح الموقع في المتصفح:
+# http://16.170.171.138.nip.io
+
+# ========================================
+# أوامر مفيدة بعد النشر
+# ========================================
+
+# عرض حالة الـ containers
+docker ps
+
+# عرض الـ logs
+docker compose -f docker-compose.prod.yml logs -f
+
+# إعادة التشغيل
+docker compose -f docker-compose.prod.yml restart
+
+# إيقاف التطبيق
+docker compose -f docker-compose.prod.yml down

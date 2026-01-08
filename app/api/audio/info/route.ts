@@ -45,7 +45,6 @@ export async function POST(request: NextRequest) {
       title: metadata.title,
       thumbnail: metadata.thumbnail,
       duration: metadata.duration,
-      channel: metadata.channel,
       audioFormats: metadata.audioFormats,
     });
   } catch (error) {

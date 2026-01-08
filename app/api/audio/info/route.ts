@@ -42,9 +42,11 @@ export async function POST(request: NextRequest) {
 
     // Return only audio-relevant data
     return NextResponse.json({
+      id: metadata.id,
       title: metadata.title,
       thumbnail: metadata.thumbnail,
       duration: metadata.duration,
+      durationFormatted: metadata.durationFormatted,
       audioFormats: metadata.audioFormats,
     });
   } catch (error) {

@@ -28,6 +28,7 @@ import {
 // yt-dlp binary path (can be configured via environment variable)
 const YTDLP_PATH = process.env.YTDLP_PATH || "yt-dlp";
 const FFMPEG_PATH = process.env.FFMPEG_PATH || "ffmpeg";
+const COOKIES_FILE = process.env.YTDLP_COOKIES_FILE || "/app/cookies.txt";
 
 /**
  * Raw format data from yt-dlp
@@ -116,8 +117,15 @@ function executeYtDlp(args: string[]): Promise<string> {
     const commonArgs = [
       '--extractor-args', 'youtube:player_client=android',
       '--user-agent', 'com.google.android.youtube/17.36.4 (Linux; U; Android 12; GB) gzip',
-      ...args
     ];
+    
+    // Add cookies if file exists (for production server)
+    const fs = require('fs');
+    if (fs.existsSync(COOKIES_FILE)) {
+      commonArgs.push('--cookies', COOKIES_FILE);
+    }
+    
+    commonArgs.push(...args);
     
     const process = spawn(YTDLP_PATH, commonArgs, {
       timeout: 60000, // 60 second timeout
